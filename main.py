@@ -39,21 +39,36 @@ def hello(message):
   #with open('data.json', 'r') as file:
   #  user = json.load(file)
   #if any(x['name'] == message.chat.first_name for x in user) is not True:
+  #проверка на бан
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if user[message.chat.username]["blacklisted"] == True:
+    bot.send_message(message.chat.id, f"Извините, но вы забанены в этом боте. Если вы думаете, что это ошибка, сообщите Ash(er)#4092!")
+    return
+  #проверка на существование аккаунта, а если нет, то создать
   try:
     with open('data.json', 'r') as file:
       user = json.load(file)
     usernamed = user[message.chat.username]
   except KeyError:
     new_account(message.chat.username, message.chat.id, message.chat.first_name, message.chat.username)
+  #вопрос от бота что нужно
   start_tab = types.ReplyKeyboardMarkup(resize_keyboard=True)
   start_tab.row(types.KeyboardButton("Профиль"), types.KeyboardButton("Об боте"), types.KeyboardButton("Лидерборд"))
   start_tab.add(types.KeyboardButton("Учиться"))
   bot.send_message(message.chat.id, f"Привет! Чем я могу помочь? \n \n Для написания команд будучи в основном меню бота, напишите что-нибудь и потом пишите!", reply_markup = start_tab)
   bot.register_next_step_handler(message, start)
 def start(message):
+  #проверка на бан
   with open('data.json', 'r') as file:
       user = json.load(file)
-  if message.text == "Учиться" and user[message.chat.username]["IsVIP"] == True or user[message.chat.username]["IsMod"] == True:
+  if user[message.chat.username]["blacklisted"] == True:
+    bot.send_message(message.chat.id, f"Извините, но вы забанены в этом боте. Если вы думаете, что это ошибка, сообщите Ash(er)#4092!")
+    return
+  #проверка, что написал собственно пользователь
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if message.text == "Учиться" and user[message.chat.username]["IsVIP"] == True:
     bot.send_message(message.chat.id, "Вы можете закрыть обучение, написав exit")
     ask(message)
     return
@@ -88,6 +103,8 @@ def start(message):
     bot.send_message(message.chat.id, "Не понял вас, повторите /start или просто игнорируйте для выхода из основного функционала бота")
     return
   bot.register_next_step_handler(message, start)
+
+#the moment when bot starts to ask you about words
 def ask(message):
   global words
   id = str(message.chat.id)
@@ -112,6 +129,7 @@ def ask(message):
   bot.send_message(message.chat.id, f"Какой перевод у слова у {words[id]['answer']['rus']}?", reply_markup=markup)
   bot.register_next_step_handler(message, check)
 
+#checks if the answer is true and gets the points out
 def check(message):
   id = str(message.chat.id)
   with open('data.json', 'r') as file:
@@ -143,6 +161,8 @@ def check(message):
   else:
     bot.send_message(message.chat.id, "Твои Free решения закончились, приходи позже или купи VIP у Ash(er)#4092!")
     hello(message)
+
+#modhelp command
 @bot.message_handler(commands = ['modhelp'])
 def modhelp(message):
   with open('data.json', 'r') as file:
@@ -152,6 +172,7 @@ def modhelp(message):
   else:
      bot.send_message(message.chat.id, "Ты не модератор!")
 
+#addtries command
 @bot.message_handler(commands = ['addtries'])
 def addtries(message):
   with open('data.json', 'r') as file:
@@ -175,4 +196,96 @@ def howmuch(message):
           user[usermod]["FreeTries"] += int(message.text)
           json.dump(user, file, indent = 4)
   bot.send_message(message.chat.id, f"Выдано {user[usermod]['username']} {message.text} решений!")
+
+#vip command
+@bot.message_handler(commands = ['vip'])
+def vip(message):
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if user[message.chat.username]["IsMod"] == True:
+    try:
+      user[message.text[5:]]
+    except KeyError:
+      bot.send_message(message.chat.id, "Неправильный ник!")
+      return
+    global usermod
+    usermod = message.text[5:]
+    if user[usermod]["IsVIP"] == False:
+      with open("data.json", "w") as file:
+        user[usermod]["IsVIP"] = True
+        json.dump(user, file, indent = 4)
+        bot.send_message(message.chat.id, f"VIP в руках {user[usermod]['username']}")
+    else:
+      bot.send_message(message.chat.id, f"{user[usermod]['username']} уже имеет VIP!")
+  else:
+    bot.send_message(message.chat.id, "Ты не модератор!")
+
+#devip command
+@bot.message_handler(commands = ['devip'])
+def devip(message):
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if user[message.chat.username]["IsMod"] == True:
+    try:
+      user[message.text[7:]]
+    except KeyError:
+      bot.send_message(message.chat.id, "Неправильный ник!")
+      return
+    global usermod
+    usermod = message.text[7:]
+    if user[usermod]["IsVIP"] == True:
+      with open("data.json", "w") as file:
+        user[usermod]["IsVIP"] = False
+        json.dump(user, file, indent = 4)
+        bot.send_message(message.chat.id, f"VIP убрано у {user[usermod]['username']}!")
+    else:
+      bot.send_message(message.chat.id, f"У {user[usermod]['username']} уже нет VIP!")
+  else:
+    bot.send_message(message.chat.id, "Ты не модератор!")
+
+#blacklist command
+@bot.message_handler(commands = ['blacklist'])
+def blacklist(message):
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if user[message.chat.username]["IsMod"] == True:
+    try:
+      user[message.text[11:]]
+    except KeyError:
+      bot.send_message(message.chat.id, "Неправильный ник!")
+      return
+    global usermod
+    usermod = message.text[11:]
+    if user[usermod]["blacklisted"] == False:
+      with open("data.json", "w") as file:
+        user[usermod]["blacklisted"] = True
+        json.dump(user, file, indent = 4)
+        bot.send_message(message.chat.id, f"{user[usermod]['username']} заблокирован!")
+    else:
+      bot.send_message(message.chat.id, f"У {user[usermod]['username']} уже заблокирован!")
+  else:
+    bot.send_message(message.chat.id, "Ты не модератор!")
+
+#whitelist command
+@bot.message_handler(commands = ['whitelist'])
+def whitelist(message):
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if user[message.chat.username]["IsMod"] == True:
+    try:
+      user[message.text[11:]]
+    except KeyError:
+      bot.send_message(message.chat.id, "Неправильный ник!")
+      return
+    global usermod
+    usermod = message.text[11:]
+    if user[usermod]["blacklisted"] == True:
+      with open("data.json", "w") as file:
+        user[usermod]["blacklisted"] = False
+        json.dump(user, file, indent = 4)
+        bot.send_message(message.chat.id, f"{user[usermod]['username']} разблокирован!")
+    else:
+      bot.send_message(message.chat.id, f"У {user[usermod]['username']} уже разблокирован или этот аккаунт не блокировали!")
+  else:
+    bot.send_message(message.chat.id, "Ты не модератор!")
 bot.polling(none_stop = True)
