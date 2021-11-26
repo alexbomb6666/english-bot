@@ -6,7 +6,6 @@ from random import choice
 import json
 with open('db.json', 'r') as file:
   db = json.load(file)
-
 words = {}
 def new_account(account, channelid, first_name_db, username_db):
   account = {}
@@ -17,7 +16,9 @@ def new_account(account, channelid, first_name_db, username_db):
     "Bad tries" : 0,
     "IsVIP" : False,
     "IsMod" : False,
-    "channelid" : channelid
+    "channelid" : channelid,
+    "FreeTries" : 40,
+    "blacklisted" : False
   }
   with open("data.json", "w") as write_file:
       json.dump(account, write_file, indent = 4)
@@ -47,19 +48,27 @@ def hello(message):
   start_tab = types.ReplyKeyboardMarkup(resize_keyboard=True)
   start_tab.row(types.KeyboardButton("Профиль"), types.KeyboardButton("Об боте"), types.KeyboardButton("Лидерборд"))
   start_tab.add(types.KeyboardButton("Учиться"))
-  bot.send_message(message.chat.id, f"Привет! Чем я могу помочь?", reply_markup = start_tab)
+  bot.send_message(message.chat.id, f"Привет! Чем я могу помочь? \n \n Для написания команд будучи в основном меню бота, напишите что-нибудь и потом пишите!", reply_markup = start_tab)
   bot.register_next_step_handler(message, start)
 def start(message):
-  if message.text == "Учиться":
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if message.text == "Учиться" and user[message.chat.username]["IsVIP"] == True or user[message.chat.username]["IsMod"] == True:
     bot.send_message(message.chat.id, "Вы можете закрыть обучение, написав exit")
     ask(message)
     return
+  elif message.text == "Учиться" and user[message.chat.username]["IsVIP"] == False and user[message.chat.username]["FreeTries"] > 0:
+    bot.send_message(message.chat.id, "Вы можете закрыть обучение, написав exit")
+    ask(message)
+    return
+  elif message.text == "Учиться" and user[message.chat.username]["IsVIP"] == False and user[message.chat.username]["FreeTries"] <= 0:
+    bot.send_message(message.chat.id, "Твои Free решения закончились, приходи позже или купи VIP у Ash(er)#4092!")
   elif message.text == "Профиль":
     bot.send_message(message.chat.id, "В разработке!")
     with open('data.json', 'r') as file:
       user = json.load(file)
     if user[message.chat.username]["IsVIP"] == 0:
-      bot.send_message(message.chat.id, f"Вы, {message.chat.first_name}:\n Прорешали {user[message.chat.username]['Good tries']} раз правильно;\n Прорешали {user[message.chat.username]['Bad tries']} раз неправильно;\n Вип подписка неактивна.")
+      bot.send_message(message.chat.id, f"Вы {message.chat.first_name}:\n Основное: \n Прорешали {user[message.chat.username]['Good tries']} раз правильно;\n Прорешали {user[message.chat.username]['Bad tries']} раз неправильно.\n Биллинг и др: \n Вип подписка неактивна; \n У вас {user[message.chat.username]['FreeTries']} бесплатных решений осталось.")
     else:
       bot.send_message(message.chat.id, f"Вы, {message.chat.first_name}:\n Прорешали {user[message.chat.username]['Good tries']} раз правильно;\n Прорешали {user[message.chat.username]['Bad tries']} раз неправильно;\n Вип подписка активна.")
     if user[message.chat.username]['Good tries'] > user[message.chat.username]['Bad tries']:
@@ -70,13 +79,14 @@ def start(message):
       bot.send_message(message.chat.id, "Как сказал один мудрый парень: 'быть в абсолютном балансе - очень хорошая стратегия'. Продолжай в том же духе!")
   elif message.text == "Об боте":
     bot.send_message(message.chat.id, "Бот создан по мотиву экземпляра бота компании Coddy. Индивидуально сделал его я, Ash(er)#4092")
-    
   elif message.text == "/start":
-    hello()
+    hello(message)
+    return
   elif message.text == "Лидерборд":
     bot.send_message(message.chat.id, "В разработке!")
   else:
-    bot.send_message(message.chat.id, "Не понял вас, повторите еще раз.")
+    bot.send_message(message.chat.id, "Не понял вас, повторите /start или просто игнорируйте для выхода из основного функционала бота")
+    return
   bot.register_next_step_handler(message, start)
 def ask(message):
   global words
@@ -104,23 +114,65 @@ def ask(message):
 
 def check(message):
   id = str(message.chat.id)
-  if message.text == '***exit***':
-    bot.send_message(message.chat.id, "Вы закрыли обучение!")
-    hello(message)
-    return
-  if message.text == words[id]['answer']['eng']:
-    bot.send_message(message.chat.id, "Правильно!")
-    with open('data.json', 'r') as file:
+  with open('data.json', 'r') as file:
       user = json.load(file)
-    with open("data.json", "w") as file:
-      user[message.chat.username]["Good tries"] += 1
-      json.dump(user, file, indent = 4)
+  if user[message.chat.username]["IsVIP"] == True or user[message.chat.username]["IsMod"] == True or user[message.chat.username]["FreeTries"] > 0:
+    if message.text == '***exit***':
+      bot.send_message(message.chat.id, "Вы закрыли обучение!")
+      hello(message)
+      return
+    if message.text == words[id]['answer']['eng']:
+      bot.send_message(message.chat.id, "Правильно!")
+      with open('data.json', 'r') as file:
+        user = json.load(file)
+      with open("data.json", "w") as file:
+        user[message.chat.username]["Good tries"] += 1
+        json.dump(user, file, indent = 4)
+    else:
+      bot.send_message(message.chat.id, f"Неверно! Правильный ответ: {words[id]['answer']['eng']}")
+      with open('data.json', 'r') as file:
+        user = json.load(file)
+      with open("data.json", "w") as file:
+        user[message.chat.username]["Bad tries"] += 1
+        json.dump(user, file, indent = 4)
+    ask(message)
+    if user[message.chat.username]["IsVIP"] == False and user[message.chat.username]["IsMod"] == False:
+      with open("data.json", "w") as file:
+          user[message.chat.username]["FreeTries"] -= 1
+          json.dump(user, file, indent = 4)
   else:
-    bot.send_message(message.chat.id, "Неверно!")
-    with open('data.json', 'r') as file:
+    bot.send_message(message.chat.id, "Твои Free решения закончились, приходи позже или купи VIP у Ash(er)#4092!")
+    hello(message)
+@bot.message_handler(commands = ['modhelp'])
+def modhelp(message):
+  with open('data.json', 'r') as file:
       user = json.load(file)
-    with open("data.json", "w") as file:
-      user[message.chat.username]["Bad tries"] += 1
-      json.dump(user, file, indent = 4)
-  ask(message)
+  if user[message.chat.username]["IsMod"] == True:
+    bot.send_message(message.chat.id, "Команды для модераторов: \n /addtries [username] - добавляет бесплатных решений к аккаунту \n /vip [username] - дает vip аккаунту \n /devip [username] - убирает у игрока vip \n /blacklist [username] - добавить никнейм к заблокированным пользователям \n /whitelist [username] - разблокирует пользователя (противоположно прошлой команде)")
+  else:
+     bot.send_message(message.chat.id, "Ты не модератор!")
+
+@bot.message_handler(commands = ['addtries'])
+def addtries(message):
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  if user[message.chat.username]["IsMod"] == True:
+    try:
+      user[message.text[10:]]
+    except KeyError:
+      bot.send_message(message.chat.id, "Неправильный ник!")
+      return
+    global usermod
+    usermod = message.text[10:]
+    bot.send_message(message.chat.id, "Сколько решений?")
+    bot.register_next_step_handler(message, howmuch)
+  else:
+    bot.send_message(message.chat.id, "Ты не модератор!")
+def howmuch(message):
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  with open("data.json", "w") as file:
+          user[usermod]["FreeTries"] += int(message.text)
+          json.dump(user, file, indent = 4)
+  bot.send_message(message.chat.id, f"Выдано {user[usermod]['username']} {message.text} решений!")
 bot.polling(none_stop = True)
