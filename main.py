@@ -45,7 +45,7 @@ def hello(message):
   except KeyError:
     new_account(message.chat.username, message.chat.id, message.chat.first_name, message.chat.username)
   start_tab = types.ReplyKeyboardMarkup(resize_keyboard=True)
-  start_tab.row(types.KeyboardButton("Профиль"), types.KeyboardButton("Об боте"))
+  start_tab.row(types.KeyboardButton("Профиль"), types.KeyboardButton("Об боте"), types.KeyboardButton("Лидерборд"))
   start_tab.add(types.KeyboardButton("Учиться"))
   bot.send_message(message.chat.id, f"Привет! Чем я могу помочь?", reply_markup = start_tab)
   bot.register_next_step_handler(message, start)
@@ -53,6 +53,7 @@ def start(message):
   if message.text == "Учиться":
     bot.send_message(message.chat.id, "Вы можете закрыть обучение, написав exit")
     ask(message)
+    return
   elif message.text == "Профиль":
     bot.send_message(message.chat.id, "В разработке!")
     with open('data.json', 'r') as file:
@@ -67,15 +68,16 @@ def start(message):
       bot.send_message(message.chat.id, "Не беспокойтесь о своих ошибках! Каждая ошибка научит вас новым вещам и тому как их избежать!")
     elif user[message.chat.username]['Good tries'] == user[message.chat.username]['Bad tries']:
       bot.send_message(message.chat.id, "Как сказал один мудрый парень: 'быть в абсолютном балансе - очень хорошая стратегия'. Продолжай в том же духе!")
-    bot.register_next_step_handler(message, start)
   elif message.text == "Об боте":
     bot.send_message(message.chat.id, "Бот создан по мотиву экземпляра бота компании Coddy. Индивидуально сделал его я, Ash(er)#4092")
-    bot.register_next_step_handler(message, start)
+    
   elif message.text == "/start":
     hello()
+  elif message.text == "Лидерборд":
+    bot.send_message(message.chat.id, "В разработке!")
   else:
     bot.send_message(message.chat.id, "Не понял вас, повторите еще раз.")
-    bot.register_next_step_handler(message, start)
+  bot.register_next_step_handler(message, start)
 def ask(message):
   global words
   id = str(message.chat.id)
