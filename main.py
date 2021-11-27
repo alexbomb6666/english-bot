@@ -134,7 +134,31 @@ def start(message):
       hello(message)
       return
     elif message.text == "Лидерборд":
-      bot.send_message(message.chat.id, "В разработке!")
+      bot.send_message(message.chat.id, "Топ 100.")
+      def keys(people):
+        return people[1]
+      lead_people = []
+      with open('data.json', 'r') as file:
+        user = json.load(file)
+      for _ in user:
+        lead_people.append([user[_]["username"], user[_]["Good tries"]])
+      lead_people.sort(reverse = True, key = keys)
+      count = 0
+      board = ""
+      if len(lead_people) >= 100:
+        for _ in range(100):
+          board += f"\n {str(count + 1)}. <b>{lead_people[count][0]}</b> с <b>{lead_people[count][1]}</b> правильными решениями"
+          count += 1
+          if lead_people[count - 1][0] == message.chat.username:
+            you = f"Вы, {message.chat.username}, на {count}-ом месте"
+      else:
+        for _ in range(len(lead_people)):
+          board += f"\n {str(count + 1)}. <b>{lead_people[count][0]}</b> с {lead_people[count][1]} правильными решениями "
+          count += 1
+          if lead_people[count - 1][0] == message.chat.username:
+            you = f"Вы, <b>{message.chat.username}</b>, на <b>{count}</b>-ом месте"
+      bot.send_message(message.chat.id, board, parse_mode='HTML')
+      bot.send_message(message.chat.id, you, parse_mode='HTML')
     else:
       bot.send_message(message.chat.id, "Не понял вас, повторите /start или просто игнорируйте для выхода из основного функционала бота")
       return
@@ -169,7 +193,31 @@ def start(message):
       hello(message)
       return
     elif message.text == "Leaderboard":
-      bot.send_message(message.chat.id, "WIP.")
+      bot.send_message(message.chat.id, "Top 100.")
+      def keys(people):
+        return people[1]
+      lead_people = []
+      with open('data.json', 'r') as file:
+        user = json.load(file)
+      for _ in user:
+        lead_people.append([user[_]["username"], user[_]["Good tries"]])
+      lead_people.sort(reverse = True, key = keys)
+      count = 0
+      board = ""
+      if len(lead_people) >= 100:
+        for _ in range(100):
+          board += f"\n {str(count + 1)}. <b>{lead_people[count][0]}</b> with <b>{lead_people[count][1]}</b> right guesses"
+          count += 1
+          if lead_people[count - 1][0] == message.chat.username:
+            you = f"You, {message.chat.username}, are on {count}th place"
+      else:
+        for _ in range(len(lead_people)):
+          board += f"\n {str(count + 1)}. <b>{lead_people[count][0]}</b> with <b>{lead_people[count][1]}</b> right guesses"
+          count += 1
+          if lead_people[count - 1][0] == message.chat.username:
+            you = f"You, <b>{message.chat.username}</b>, are on <b>{count}</b>th place"
+      bot.send_message(message.chat.id, board, parse_mode='HTML')
+      bot.send_message(message.chat.id, you, parse_mode='HTML')
     else:
       bot.send_message(message.chat.id, "Sorry, didnt get you :( say /start")
       return
