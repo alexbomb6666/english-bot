@@ -4,11 +4,23 @@
         "name": "AlexbombPlay",
         "Good tries": 0,
         "Bad tries": 0,
-        "IsVIP": false,
+        "IsVIP": true,
         "IsMod": true,
         "channelid": 1084295275,
-        "FreeTries": -70,
+        "FreeTries": 50,
         "blacklisted": false,
         "language": "english"
+    },
+    "Sanyakja": {
+        "username": "Sanyakja",
+        "name": "Sanyakja",
+        "Good tries": 33,
+        "Bad tries": 7,
+        "IsVIP": true,
+        "IsMod": false,
+        "channelid": 851598280,
+        "FreeTries": 0,
+        "blacklisted": false,
+        "language": "russian"
     }
 }

@@ -433,4 +433,14 @@ def whitelist(message):
       bot.send_message(message.chat.id, f"У {user[usermod]['username']} уже разблокирован или этот аккаунт не блокировали!")
   else:
     bot.send_message(message.chat.id, "Ты не модератор!")
+#broadcast command
+@bot.message_handler(commands = ['broadcast'])
+def broadcast(message):
+  with open('data.json', 'r') as file:
+    user = json.load(file)
+  if message.chat.username == "alexbomb6666":
+    for _ in user:
+      if user[_]["channelid"] != 1084295275:
+        bot.send_message(user[_]["channelid"], message.text[11:])
+    bot.send_message(message.chat.id, "Сообщение прислано всем!")
 bot.polling(none_stop = True)
