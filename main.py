@@ -444,3 +444,4 @@ def broadcast(message):
         bot.send_message(user[_]["channelid"], message.text[11:])
     bot.send_message(message.chat.id, "Сообщение прислано всем!")
 bot.polling(none_stop = True)
+#https://pythonim.ru/list/metod-sort-python просмотреть
