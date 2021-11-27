@@ -8,8 +8,9 @@ with open('db.json', 'r') as file:
   db = json.load(file)
 words = {}
 def new_account(account, channelid, first_name_db, username_db, preferred_language):
-  account = {}
-  account[username_db] = {
+  with open('data.json', 'r') as file:
+      user = json.load(file)
+  user[username_db] = {
     "username" : username_db,
     "name" : first_name_db,
     "Good tries" : 0, 
@@ -22,7 +23,7 @@ def new_account(account, channelid, first_name_db, username_db, preferred_langua
     "language" : preferred_language
   }
   with open("data.json", "w") as write_file:
-      json.dump(account, write_file, indent = 4)
+      json.dump(user, write_file, indent = 4)
 token = os.environ['token']
 bot = telebot.TeleBot(token)
 temp = None
@@ -54,6 +55,7 @@ def hello(message):
     language_tab.row(types.KeyboardButton("Russian/Русский"), types.KeyboardButton("English/Английский"))
     bot.send_message(message.chat.id, f"Привет! На каком языке ты разговариваешь? (Этот параметр пока нельзя будет обновлять сейчас, то есть выбирай с умом) \n Hello! On what language do you speak? (Remember, that parameter can't be changed later for now!", reply_markup = language_tab)
     bot.register_next_step_handler(message, language_check)
+    return
   
   if user[message.chat.username]["blacklisted"] == True:
     bot.send_message(message.chat.id, f"Извините, но вы забанены в этом боте. Если вы думаете, что это ошибка, сообщите Ash(er)#4092!")
@@ -305,22 +307,41 @@ def addtries(message):
     try:
       user[message.text[10:]]
     except KeyError:
-      bot.send_message(message.chat.id, "Неправильный ник!")
-      return
+      if message.text[10:] != "all":
+        bot.send_message(message.chat.id, "Неправильный ник!")
+        return
     global usermod
     usermod = message.text[10:]
-    bot.send_message(message.chat.id, "Сколько решений?")
+    bot.send_message(message.chat.id, "Сколько решений? \n P.S. Для вычитания введите отрицательное число")
     bot.register_next_step_handler(message, howmuch)
   else:
     bot.send_message(message.chat.id, "Ты не модератор!")
 def howmuch(message):
   with open('data.json', 'r') as file:
       user = json.load(file)
-  with open("data.json", "w") as file:
-          user[usermod]["FreeTries"] += int(message.text)
-          json.dump(user, file, indent = 4)
-  bot.send_message(message.chat.id, f"Выдано {user[usermod]['username']} {message.text} решений! У пользователя теперь {user[usermod]['FreeTries']} решений!")
-
+  if usermod != "all":
+    with open("data.json", "w") as file:
+        user[usermod]["FreeTries"] += int(message.text)
+        json.dump(user, file, indent = 4)
+    if int(message.text) > 0:
+      bot.send_message(message.chat.id, f"Выдано {user[usermod]['username']} {message.text} решений! У пользователя теперь {user[usermod]['FreeTries']} решений!")
+    elif int(message.text) == 0:
+      bot.send_message(message.chat.id, f"Вы ввели 0, введите число еще раз")
+      bot.register_next_step_handler(message, howmuch)
+    elif int(message.text) < 0:
+      bot.send_message(message.chat.id, f"Вы убрали {message.text} решений у {usermod}!")
+  else:
+    with open("data.json", "w") as file:
+      for x in user:
+        user[x]["FreeTries"] += int(message.text)
+      json.dump(user, file, indent = 4)
+    if int(message.text) > 0:
+      bot.send_message(message.chat.id, f"Всем пользователям выдано {message.text} решений!")
+    elif int(message.text) == 0:
+      bot.send_message(message.chat.id, f"Вы ввели 0, введите число еще раз")
+      bot.register_next_step_handler(message, howmuch)
+    elif int(message.text) < 0:
+      bot.send_message(message.chat.id, f"Вы убрали {message.text} решений у всех!")
 #vip command
 @bot.message_handler(commands = ['vip'])
 def vip(message):

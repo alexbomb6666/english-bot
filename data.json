@@ -2,13 +2,13 @@
     "alexbomb6666": {
         "username": "alexbomb6666",
         "name": "AlexbombPlay",
-        "Good tries": 3,
-        "Bad tries": 1,
+        "Good tries": 0,
+        "Bad tries": 0,
         "IsVIP": false,
         "IsMod": true,
         "channelid": 1084295275,
-        "FreeTries": 100,
-        "blacklisted": true,
+        "FreeTries": -70,
+        "blacklisted": false,
         "language": "english"
     }
 }
