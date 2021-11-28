@@ -248,7 +248,7 @@ def ask(message):
       count += 1
     exitting = types.KeyboardButton("***exit***")
     markup.row(item1, item2, item3, item4)
-    markup.add(exitting)				
+    markup.add(exitting, types.KeyboardButton("Изменить язык"))				
     bot.send_message(message.chat.id, f"Какой перевод у слова у {words[id]['answer']['rus']}?", reply_markup=markup)
     bot.register_next_step_handler(message, check)
   elif user[message.chat.username]["language"] == "english":
@@ -270,7 +270,7 @@ def ask(message):
       count += 1
     exitting = types.KeyboardButton("***exit***")
     markup.row(item1, item2, item3, item4)
-    markup.add(exitting)				
+    markup.row(exitting, types.KeyboardButton("Change language"))				
     bot.send_message(message.chat.id, f"What is the translate of {words[id]['answer']['eng']}?", reply_markup=markup)
     bot.register_next_step_handler(message, check)
 
@@ -285,6 +285,13 @@ def check(message):
         bot.send_message(message.chat.id, "Вы закрыли обучение!")
         hello(message)
         return
+      if message.text == "Change language":
+        if user[message.chat.username]["language"] == "russian":
+          user[message.chat.username]["language"] = "english"
+        elif user[message.chat.username]["language"] == "english":
+          user[message.chat.username]["language"] = "russian"
+        with open("data.json", "w") as file:
+          json.dump(user, file, indent = 4)
       if message.text == words[id]['answer']['eng']:
         bot.send_message(message.chat.id, "Правильно!")
         with open('data.json', 'r') as file:
