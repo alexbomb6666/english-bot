@@ -285,14 +285,16 @@ def check(message):
         bot.send_message(message.chat.id, "Вы закрыли обучение!")
         hello(message)
         return
-      if message.text == "Change language":
+      elif message.text == "Изменить язык":
         if user[message.chat.username]["language"] == "russian":
-          user[message.chat.username]["language"] = "english"
+          with open("data.json", "w") as file:
+            user[message.chat.username]["language"] = "english"
+            json.dump(user, file, indent = 4)
         elif user[message.chat.username]["language"] == "english":
-          user[message.chat.username]["language"] = "russian"
-        with open("data.json", "w") as file:
-          json.dump(user, file, indent = 4)
-      if message.text == words[id]['answer']['eng']:
+          with open("data.json", "w") as file:
+            user[message.chat.username]["language"] = "russian"
+            json.dump(user, file, indent = 4)
+      elif message.text == words[id]['answer']['eng']:
         bot.send_message(message.chat.id, "Правильно!")
         with open('data.json', 'r') as file:
           user = json.load(file)
@@ -303,14 +305,11 @@ def check(message):
         bot.send_message(message.chat.id, f"Неверно! Правильный ответ: {words[id]['answer']['eng']}")
         with open('data.json', 'r') as file:
           user = json.load(file)
-        with open("data.json", "w") as file:
-          user[message.chat.username]["Bad tries"] += 1
-          json.dump(user, file, indent = 4)
+        if user[message.chat.username]["IsVIP"] == False and user[message.chat.username]["IsMod"] == False:
+          with open("data.json", "w") as file:
+            user[message.chat.username]["FreeTries"] -= 1
+            json.dump(user, file, indent = 4)
       ask(message)
-      if user[message.chat.username]["IsVIP"] == False and user[message.chat.username]["IsMod"] == False:
-        with open("data.json", "w") as file:
-          user[message.chat.username]["FreeTries"] -= 1
-          json.dump(user, file, indent = 4)
     else:
       bot.send_message(message.chat.id, "Твои Free решения закончились, приходи позже или купи VIP у Ash(er)#4092!")
       hello(message)
@@ -320,7 +319,16 @@ def check(message):
         bot.send_message(message.chat.id, "You closed learning down!")
         hello(message)
         return
-      if message.text == words[id]['answer']['rus']:
+      elif message.text == "Change language":
+        if user[message.chat.username]["language"] == "russian":
+          with open("data.json", "w") as file:
+            user[message.chat.username]["language"] = "english"
+            json.dump(user, file, indent = 4)
+        elif user[message.chat.username]["language"] == "english":
+          with open("data.json", "w") as file:
+            user[message.chat.username]["language"] = "russian"
+            json.dump(user, file, indent = 4)
+      elif message.text == words[id]['answer']['rus']:
         bot.send_message(message.chat.id, "This is the right answer!")
         with open('data.json', 'r') as file:
           user = json.load(file)
@@ -331,14 +339,11 @@ def check(message):
         bot.send_message(message.chat.id, f"Not right! The right answer is: {words[id]['answer']['rus']}")
         with open('data.json', 'r') as file:
           user = json.load(file)
-        with open("data.json", "w") as file:
-          user[message.chat.username]["Bad tries"] += 1
-          json.dump(user, file, indent = 4)
+        if user[message.chat.username]["IsVIP"] == False and user[message.chat.username]["IsMod"] == False:
+          with open("data.json", "w") as file:
+            user[message.chat.username]["FreeTries"] -= 1
+            json.dump(user, file, indent = 4)
       ask(message)
-      if user[message.chat.username]["IsVIP"] == False and user[message.chat.username]["IsMod"] == False:
-        with open("data.json", "w") as file:
-          user[message.chat.username]["FreeTries"] -= 1
-          json.dump(user, file, indent = 4)
     else:
       bot.send_message(message.chat.id, "Your free guesses ended, come back later on contact Ash(er)#4092!")
       hello(message)
