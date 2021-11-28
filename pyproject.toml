@@ -8,6 +8,13 @@ authors = ["Your Name <you@example.com>"]
 python = "^3.8"
 gazpacho = "^1.1"
 pyTelegramBotAPI = "^4.2.0"
+ujson = "^4.3.0"
+unicodedata2 = "^13.0.0"
+Brotli = "^1.0.9"
+cryptography = "^36.0.0"
+python-ntlm = "^1.1.0"
+redis = "^4.0.2"
+simplejson = "^3.17.6"
 
 [tool.poetry.dev-dependencies]
 

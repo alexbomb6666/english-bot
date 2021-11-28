@@ -1,16 +1,4 @@
 {
-    "alexbomb6666": {
-        "username": "alexbomb6666",
-        "name": "AlexbombPlay",
-        "Good tries": 0,
-        "Bad tries": 0,
-        "IsVIP": true,
-        "IsMod": true,
-        "channelid": 1084295275,
-        "FreeTries": 50,
-        "blacklisted": false,
-        "language": "russian"
-    },
     "Sanyakja": {
         "username": "Sanyakja",
         "name": "Sanyakja",
@@ -22,5 +10,17 @@
         "FreeTries": 0,
         "blacklisted": false,
         "language": "russian"
+    },
+    "alexbomb6666": {
+        "username": "alexbomb6666",
+        "name": "AlexbombPlay",
+        "Good tries": 1,
+        "Bad tries": 0,
+        "IsVIP": false,
+        "IsMod": false,
+        "channelid": 1084295275,
+        "FreeTries": 39,
+        "blacklisted": false,
+        "language": "english"
     }
 }

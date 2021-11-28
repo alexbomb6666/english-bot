@@ -1,3 +1,12 @@
 {
-  "files": {}
+  "files": {
+    "data.json": [
+      {
+        "id": "060bc27a-f3e7-4fd6-8ea2-2400c2f9f82f",
+        "line": 26,
+        "version": 365,
+        "index": 610
+      }
+    ]
+  }
 }

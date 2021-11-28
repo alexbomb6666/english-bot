@@ -24,7 +24,7 @@ def new_account(account, channelid, first_name_db, username_db, preferred_langua
   }
   with open("data.json", "w") as write_file:
       json.dump(user, write_file, indent = 4)
-token = os.environ['token']
+token = "2054522973:AAE2VtaZ5ikYFTLt40hTZ-N-fQIsE5KIU6U"
 bot = telebot.TeleBot(token)
 temp = None
 def find_website_element(site, where, classes):
