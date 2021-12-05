@@ -129,7 +129,7 @@ def start(message):
       elif user[message.chat.username]['Good tries'] == user[message.chat.username]['Bad tries']:
         bot.send_message(message.chat.id, "Как сказал один мудрый парень: 'быть в абсолютном балансе - очень хорошая стратегия'. Продолжай в том же духе!")
     elif message.text == "Об боте":
-      bot.send_message(message.chat.id, "Бот создан по мотиву экземпляра бота компании Coddy. Индивидуально сделал его я, Ash(er)#4092")
+      bot.send_message(message.chat.id, "Бот создан по мотиву экземпляра бота компании Coddy. Индивидуально сделал его я, Ash(er)#4092 . Также я выложил код в открытое пользование! Зайдите сюда (английское написание): https://app.archbee.io/public/hgDITX7tT9PSg_7J-Gz-d")
     elif message.text == "/start":
       hello(message)
       return
@@ -188,7 +188,7 @@ def start(message):
       elif user[message.chat.username]['Good tries'] == user[message.chat.username]['Bad tries']:
         bot.send_message(message.chat.id, "As one wise man said, 'perfect balance is always wise way to go into perfect future' Keep it up!")
     elif message.text == "About":
-      bot.send_message(message.chat.id, "Bot is made by the example of english bot in Coddy. The original maker of the bot is Ash(er)#4092")
+      bot.send_message(message.chat.id, "Bot is made by the example of english bot in Coddy. The original maker of the bot is Ash(er)#4092 . Also, this bot went open-source! Visit https://app.archbee.io/public/hgDITX7tT9PSg_7J-Gz-d for more info.")
     elif message.text == "/start":
       hello(message)
       return
